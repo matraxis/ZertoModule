@@ -490,61 +490,6 @@ class VPGFailoverIPAddress {
     
 }
 
-# .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGFailoverIPAddress {
-    #Parameter Sets
-    # Default NICName Req, NetworkID,  ReplaceMAC, TestNetworkID TestReplaceMAC Optional
-    #  1) DHCP req, FailDHCP optional
-    #  3) IPaddress, Submet, Gateway, DNS1, DN2, DNSSUfix req, Test versions opt
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, HelpMessage = 'vCenter NIC Name')]          [String] $NICName,
-        [Parameter(Mandatory=$false, HelpMessage = 'Zerto Network ID')]         [String] $NetworkID,
-        [Parameter(Mandatory=$false, HelpMessage = 'Replace MAC Address')]      [Bool]   $ReplaceMAC = $false,
-        [Parameter(Mandatory=$false, HelpMessage = 'Test Zerto Network ID')]    [String] $TestNetworkID,
-        [Parameter(Mandatory=$false, HelpMessage = 'Test Replace MAC Address')] [Bool]   $TestReplaceMAC = $false,
-        [Parameter(Mandatory=$true, HelpMessage = 'DNS Domain Suffix')]         [String] $DNSSuffix,
-        [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Domain Suffix')]   [String] $TestDNSSuffix,
-
-        [Parameter(Mandatory=$true, HelpMessage = 'Use DHCP', ParameterSetName = 'DHCP')]           [switch] $UseDHCP,
-        [Parameter(Mandatory=$false, HelpMessage = 'Use DHCP for test', ParameterSetName = 'DHCP')] [switch] $TestUseDHCP,
-
-        [Parameter(Mandatory=$true, HelpMessage = 'IP Address', ParameterSetName = 'IP')]           [String] $IPAddress,
-        [Parameter(Mandatory=$true, HelpMessage = 'Subnet Mask', ParameterSetName = 'IP')]          [String] $SubnetMask,
-        [Parameter(Mandatory=$true, HelpMessage = 'Gateway', ParameterSetName = 'IP')]              [String] $Gateway,
-        [Parameter(Mandatory=$true, HelpMessage = 'DNS Server 1', ParameterSetName = 'IP')]         [String] $DNS1,
-        [Parameter(Mandatory=$true, HelpMessage = 'DNS Server 2', ParameterSetName = 'IP')]         [String] $DNS2,
-        [Parameter(Mandatory=$false, HelpMessage = 'Test IP Address', ParameterSetName = 'IP')]     [String] $TestIPAddress,
-        [Parameter(Mandatory=$false, HelpMessage = 'Test Subnet Mask', ParameterSetName = 'IP')]    [String] $TestSubnetMask,
-        [Parameter(Mandatory=$false, HelpMessage = 'Test Gateway', ParameterSetName = 'IP')]        [String] $TestGateway,
-        [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Server 1', ParameterSetName = 'IP')]   [String] $TestDNS1,
-        [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Server 2', ParameterSetName = 'IP')]   [String] $TestDNS2
-    )
-    
-    Write-Verbose $PSCmdlet.ParameterSetName
-    If ($PSCmdlet.ParameterSetName -eq 'DHCP') {
-        if (-not $UseDHCP) { throw "If UseDHCP is false, IP addresses must be specified" }
-        [VPGFailoverIPAddress] $NewZertoIP = [VPGFailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $UseDHCP, $DNSSuffix, `
-                                                                    $TestNetworkID, $TestReplaceMAC, $TestUseDHCP, $TestDNSSuffix);
-    } else {
-        try { $TestIP = [IPAddress]$IPAddress  } catch {throw "Invalid IP Address '$IPAddress'"}
-        try { $TestIP = [IPAddress]$SubnetMask } catch {throw "Invalid Subnet Mask '$SubnetMask'"}
-        try { $TestIP = [IPAddress]$Gateway    } catch {throw "Invalid Gateway '$Gateway'"}
-        try { $TestIP = [IPAddress]$DNS1       } catch {throw "Invalid DNS1 '$DNS1'"}
-        try { $TestIP = [IPAddress]$DNS2       } catch {throw "Invalid DNS2 '$DNS2'"}
-        try { if ($TestIPAddress)  { $TestIP = [IPAddress]$TestIPAddress }  } catch {throw "Invalid Test IP Address '$TestPAddress'"}
-        try { if ($TestSubnetMask) { $TestIP = [IPAddress]$TestSubnetMask } } catch {throw "Invalid Test Subnet Mask '$TestSubnetMask'"}
-        try { if ($TestGateway)    { $TestIP = [IPAddress]$TestGateway }    } catch {throw "Invalid Test Gateway '$TestGateway'"}
-        try { if ($TestDNS1)       { $TestIP = [IPAddress]$TestDNS1 }       } catch {throw "Invalid Test DNS1 '$TestDNS1'"}
-        try { if ($TestDNS2)       { $TestIP = [IPAddress]$TestDNS2 }       } catch {throw "Invalid Test DNS2 '$TestDNS2'"}
-
-        [VPGFailoverIPAddress] $NewZertoIP = [VPGFailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $IPAddress, `
-                                                $SubnetMask, $Gateway, $DNS1, $DNS2, $DNSSuffix, $TestNetworkID, $TestReplaceMAC, `
-                                                $TestIPAddress, $TestSubnetMask, $TestGateway, $TestDNS1, $TestDNS2, $TestDNSSuffix);
-    }
-    Return $NewZertoIP    
-}
-
 class VPGVMRecovery {
     [string] $DatastoreClusterIdentifier;
     [string] $DatastoreIdentifier;
@@ -574,28 +519,7 @@ class VPGVMRecovery {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGVMRecovery {
-    [CmdletBinding(DefaultParameterSetName = 'Individual')]
-    param (
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier , 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier , 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'FolderIdentifier')] [string] $FolderIdentifier , 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostClusterIdentifier')] [string] $HostClusterIdentifier , 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostIdentifier')] [string] $HostIdentifier , 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'ResourcePoolIdentifier')] [string] $ResourcePoolIdentifier , 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGVMRecovery ')] [PSCustomObject] $VPGVMRecovery 
-    )
-    
-    if (-not $VPGVMRecovery) {
-        [VPGVMRecovery] $NewObj = [VPGVMRecovery]::New( $DatastoreClusterIdentifier, $DatastoreIdentifier, $FolderIdentifier, `
-                                                        $HostClusterIdentifier, $HostIdentifier, $ResourcePoolIdentifier);
 
-    } else {
-        [VPGVMRecovery] $NewObj = [VPGVMRecovery]::New($VPGVMRecovery)
-    }
-
-    Return $NewObj
-}
 
 class VPGVirtualMachine {
     [string] $VMName;
@@ -634,27 +558,7 @@ class VPGVirtualMachine {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGVirtualMachine {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Name')]     [String] $VMName,
-        [Parameter(Mandatory=$false, HelpMessage = 'Zerto IPAddresses')]  [VPGFailoverIPAddress[]] $VPGFailoverIPAddress,
-        [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Recovery Object')]  [VPGVMRecovery] $VPGVMRecovery
-        #Add other optional vpg components here
-    )
-    
-    [VPGVirtualMachine] $NewZertoVM = [VPGVirtualMachine]::New($VMName);
 
-    if ($VPGFailoverIPAddress)  {
-        $NewZertoVM.AddVPGFailoverIPAddress($VPGFailoverIPAddress)
-    }
-    if ($VPGVMRecovery)  {
-        $NewZertoVM.AddVPGVMRecovery($VPGVMRecovery)
-    }
-    #Add other optional vpg components Add's here
-
-    Return $NewZertoVM    
-}
 
 class VRAIPAddressConfig {
         [String] $IPAddress;
@@ -673,22 +577,7 @@ class VRAIPAddressConfig {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVRAIPAddressConfig {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, HelpMessage = 'IP Address')]           [String] $IPAddress,
-        [Parameter(Mandatory=$true, HelpMessage = 'Subnet Mask')]          [String] $SubnetMask,
-        [Parameter(Mandatory=$true, HelpMessage = 'Gateway')]              [String] $Gateway,
-        [Parameter(Mandatory=$true, HelpMessage = 'Zerto VRA IP Config Type')] [ZertoVRAIPConfigType] $VRAIPType
-    )
-    
-    try { $TestIP = [IPAddress]$IPAddress  } catch {throw "Invalid IP Address '$IPAddress'"}
-    try { $TestIP = [IPAddress]$SubnetMask  } catch {throw "Invalid SubnetMask '$SubnetMask'"}
-    try { $TestIP = [IPAddress]$Gateway  } catch {throw "Invalid Gateway '$Gateway'"}
 
-    [VRAIPAddressConfig] $NewVRAIPAddressConfig = [VRAIPAddressConfig]::new( $IPAddress, $SubnetMask, $Gateway, $VRAIPType);
-    Return $NewVRAIPAddressConfig    
-}
 
 class ZertoVPGSettingBackupRetry {
     [int] $IntervalInMinutes; 
@@ -708,27 +597,7 @@ class ZertoVPGSettingBackupRetry {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingBackupRetry {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Number of minutes to wait on failure to retry backup')] [int] $IntervalInMinutes, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Number of retries')] [int] $Number, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Retry the backup if it fails')] [bool] $Retry, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Backup Retry')] [PSCustomObject] $VPGSettingBackupRetry
-    )
-    
-    if (-not $VPGSettingBackupRetry) {
-        if ($Number -lt 1) { throw "Number of Retries must be more than 1" }
-        if ($IntervalInMinutes -lt 1) { throw "Retry Interval must be more than 1" }
-        [ZertoVPGSettingBackupRetry] $NewObj = [ZertoVPGSettingBackupRetry]::New($IntervalInMinutes, $Number, $Retry);
-    } else {
-        if ($VPGSettingBackupRetry.Number -lt 1) { throw "Number of Retries must be more than 1" }
-        if ($VPGSettingBackupRetry.IntervalInMinutes -lt 1) { throw "Retry Interval must be more than 1" }
-        [ZertoVPGSettingBackupRetry] $NewObj = [ZertoVPGSettingBackupRetry]::New($VPGSettingBackupRetry)
-    }
 
-    Return $NewObj
-}
     
 class ZertoVPGSettingBackupScheduler {
     [string] $DayOfWeek; 
@@ -748,35 +617,7 @@ class ZertoVPGSettingBackupScheduler {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingBackupScheduler {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Day of week the backup will run')] [ZertoVPGSettingsBackupSchedulerDOW] $DayOfWeek, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Scheduler Period (Daily|Weekly)')] [ZertoVPGSettingsBackupSchedulerPeriod] $SchedulerPeriod, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Time of day (24 hour in form 23:59)')] [string] $TimeOfDay, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Backup Scheduler')] [PSCustomObject] $VPGSettingBackupScheduler
-    )
-    
-    if (-not $VPGSettingBackupScheduler) {
-        if (-not ($TimeOfDay -match "^\d\d:\d\d$") )  { throw "Time Of Day must be in the form '23:59'" }
-        if ( ($TimeOfDay.Split(':')[0] -lt 0 ) `
-             -OR ($TimeOfDay.Split(':')[0] -gt 23 ) `
-             -OR ($TimeOfDay.Split(':')[1] -lt 0 ) `
-             -OR ($TimeOfDay.Split(':')[1] -gt 59 )  ) { throw "Time Of Day must be in the form '00:00' through '23:59'" }
 
-
-        [ZertoVPGSettingBackupScheduler] $NewObj = [ZertoVPGSettingBackupScheduler]::New($DayOfWeek, $SchedulerPeriod, $TimeOfDay);
-    } else {
-        if (-not ($VPGSettingBackupScheduler.TimeOfDay -match "^\d\d:\d\d$") )  { throw "Time Of Day must be in the form '23:59'" }
-        if ( ($VPGSettingBackupScheduler.TimeOfDay.Split(':')[0] -lt 0 ) `
-             -OR ($VPGSettingBackupScheduler.TimeOfDay.Split(':')[0] -gt 23 ) `
-             -OR ($VPGSettingBackupScheduler.TimeOfDay.Split(':')[1] -lt 0 ) `
-             -OR ($VPGSettingBackupScheduler.TimeOfDay.Split(':')[1] -gt 59 )  ) { throw "Time Of Day must be in the form '00:00' through '23:59'" }
-        [ZertoVPGSettingBackupScheduler] $NewObj = [ZertoVPGSettingBackupScheduler]::New($VPGSettingBackupScheduler)
-    }
-
-    Return $NewObj        
-}
 
 class ZertoVPGSettingBackup {
     [string] $RepositoryIdentifier; 
@@ -799,24 +640,7 @@ class ZertoVPGSettingBackup {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingBackup {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Backup Repository ID')] [string] $RepositoryIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Retention Period')] [ZertoVPGSettingsBackupRetentionPeriod] $RetentionPeriod, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Retry')] [ZertoVPGSettingBackupRetry] $Retry, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Scheduler')] [ZertoVPGSettingBackupScheduler] $Scheduler, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Backup')] [PSCustomObject] $VPGSettingBackup
-    )
-    
-    if (-not $VPGSettingBackup) {
-        [ZertoVPGSettingBackup] $NewObj = [ZertoVPGSettingBackup]::New($RepositoryIdentifier, $RetentionPeriod, $Retry, $Scheduler);
-    } else {
-        [ZertoVPGSettingBackup] $NewObj = [ZertoVPGSettingBackup]::New($VPGSettingBackup)
-    }
 
-    Return $NewObj
-}
 
 Class ZertoVPGSettingBasic {
     [int] $JournalHistoryInHours; 
@@ -860,40 +684,7 @@ Class ZertoVPGSettingBasic {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingBasic {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Name')] [string] $Name, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Protected Site Identifier')] [string] $ProtectedSiteIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Protected Site Identifier')] [string] $RecoverySiteIdentifier, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Journal History In Hours')] [int] $JournalHistoryInHours=24, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Priority')] [ZertoVPGPriority] $Priority = 'Medium', 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Zerto RPO in Seconds')] [int] $RpoInSeconds = 300, 
-        [Parameter(Mandatory=$false , ParameterSetName="Individual", HelpMessage  = 'Zerto Service Profile Identifier')] [string] $ServiceProfileIdentifier,
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Test Interval In Minutes')] [int] $TestIntervalInMinutes = 262080,
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Use Wan Compression')] [Boolean] $UseWanCompression = $true, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Zorg Identifier')] [string] $ZorgIdentifier,
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Basic')] [PSCustomObject] $VPGSettingBasic
 
-    )
-    
-    if (-not $VPGSettingBasic) {
-        if ( $JournalHistoryInHours -lt 1 ) { throw "Journal history must be greather then 0 - '$JournalHistoryInHours'"}
-        if ( $TestIntervalInMinutes -lt 1 ) { throw "Test Interval In Minutes must be greather then 0 - '$TestIntervalInMinutes'"}
-        if ( $RpoInSeconds -lt 1 ) { throw "RpoInSeconds  must be greather then 0 - '$RpoInSeconds'"}
-        [ZertoVPGSettingBasic] $NewObj = [ZertoVPGSettingBasic]::New($JournalHistoryInHours, $Name, $Priority, `
-                                                                    $ProtectedSiteIdentifier, $RecoverySiteIdentifier, $RpoInSeconds, `
-                                                                    $ServiceProfileIdentifier, $TestIntervalInMinutes, $UseWanCompression, `
-                                                                    $ZorgIdentifier );
-    } else {
-        if ( $VPGSettingBasic.JournalHistoryInHours -lt 1 ) { throw "Journal history must be greather then 0 - '$VPGSettingBasic.JournalHistoryInHours'"}
-        if ( $VPGSettingBasic.TestIntervalInMinutes -lt 1 ) { throw "Test Interval In Minutes must be greather then 0 - '$VPGSettingBasic.TestIntervalInMinutes'"}
-        if ( $VPGSettingBasic.RpoInSeconds -lt 1 ) { throw "RpoInSeconds  must be greather then 0 - '$VPGSettingBasic.RpoInSeconds'"}
-        [ZertoVPGSettingBasic] $NewObj = [ZertoVPGSettingBasic]::New($VPGSettingBasic)
-    }
-
-    Return $NewObj       
-}
 
 Class ZertoVPGSettingBootGroupsBootGroups {
     [int] $BootDelayInSeconds; 
@@ -913,25 +704,7 @@ Class ZertoVPGSettingBootGroupsBootGroups {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingBootGroupsBootGroups {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'BootDelayInSeconds')] [int] $BootDelayInSeconds, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Boot Group Identifier')] [string] $BootGroupIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Boot Group Name')] [string] $Name, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Bootgroups Bootgroups')] [PSCustomObject] $VPGSettingBootgroupsBootGroups
-    )
-    
-    if (-not $VPGSettingBootgroupsBootgroups) {
-        if ( $BootDelayInSeconds -lt 1 ) { throw "BootDelayInSeconds must be greather then 0 - '$BootDelayInSeconds'"}
-        [ZertoVPGSettingBootGroupsBootGroups] $NewObj = [ZertoVPGSettingBootGroupsBootGroups]::New($BootDelayInSeconds, $BootGroupIdentifier, $Name );
-    } else {
-        if ( $VPGSettingBootgroup.BootDelayInSeconds -lt 1 ) { throw "BootDelayInSeconds must be greather then 0 - '$VPGSettingBootgroup.BootDelayInSeconds'"}
-        [ZertoVPGSettingBootGroupsBootGroups] $NewObj = [ZertoVPGSettingBootGroupsBootGroups]::New($VPGSettingBootgroupsBootGroups)
-    }
 
-    Return $NewObj
-}
 
 Class ZertoVPGSettingBootGroups {
     [ZertoVPGSettingBootGroupsBootGroups[]] $BootGroups; 
@@ -945,21 +718,7 @@ Class ZertoVPGSettingBootGroups {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingBootGroups {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingBootgroup')] [ZertoVPGSettingBootGroups[]] $BootGroups,
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Bootgroup')] [PSCustomObject] $VPGSettingBootGroups
-    )
-    
-    if (-not $VPGSettingBootGroups) {
-        [ZertoVPGSettingBootGroups] $NewObj = [ZertoVPGSettingBootGroups]::New( $Bootgroups );
-    } else {
-        [ZertoVPGSettingBootGroups] $NewObj = [ZertoVPGSettingBootGroups]::New($VPGSettingBootGroups)
-    }
 
-    Return $NewObj
-}
 
 Class ZertoVPGSettingJournalLimitation {
     [int] $HardLimitInMB; 
@@ -982,32 +741,7 @@ Class ZertoVPGSettingJournalLimitation {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingJournalLimitation {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HardLimitInMB')] [int] $HardLimitInMB = 153600,
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HardLimitInPercent')] [int] $HardLimitInPercent, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'WarningThresholdInMB')] [int] $WarningThresholdInMB = 115200, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'WarningThresholdInPercent')] [int] $WarningThresholdInPercent, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Journal Limitation')] [PSCustomObject] $VPGSettingJournalLimitation
-    )
-    
-    if (-not $VPGSettingJournalLimitation) {
-        if ( $HardLimitInMB -lt 0 ) { throw "HardLimitInMB must be greather then 0 - '$HardLimitInMB'"}
-        if ( ($HardLimitInPercent -lt 0) -or ($HardLimitInPercent -gt 100 ) ) { throw "HardLimitInPercent must be between 0 and 100  - '$HardLimitInPercent'"}
-        if ( $WarningThresholdInMB -lt 0 ) { throw "WarningThresholdInMB must be greather then 0 - '$WarningThresholdInMB'"}
-        if ( ($WarningThresholdInPercent -lt 0) -or ($WarningThresholdInPercent -gt 100 ) ) { throw "WarningThresholdInPercent must be between 0 and 100  - '$WarningThresholdInPercent'"}
-        [ZertoVPGSettingJournalLimitation] $NewObj = [ZertoVPGSettingJournalLimitation]::New($HardLimitInMB, $HardLimitInPercent, $WarningThresholdInMB,  $WarningThresholdInPercent);
-    } else {
-        if ( $VPGSettingJournalLimitation.HardLimitInMB -lt 0 ) { throw "HardLimitInMB must be greather then 0 - '$VPGSettingJournalLimitation.HardLimitInMB'"}
-        if ( ($VPGSettingJournalLimitation.HardLimitInPercent -lt 0) -or ($VPGSettingJournalLimitation.HardLimitInPercent -gt 100 ) ) { throw "HardLimitInPercent must be between 0 and 100  - '$VPGSettingJournalLimitation.HardLimitInPercent'"}
-        if ( $VPGSettingJournalLimitation.WarningThresholdInMB -lt 0 ) { throw "WarningThresholdInMB must be greather then 0 - '$VPGSettingJournalLimitation.WarningThresholdInMB'"}
-        if ( ($VPGSettingJournalLimitation.WarningThresholdInPercent -lt 0) -or ($VPGSettingJournalLimitation.WarningThresholdInPercent -gt 100 ) ) { throw "WarningThresholdInPercent must be between 0 and 100  - '$VPGSettingJournalLimitation.WarningThresholdInPercent'"}
-        [ZertoVPGSettingJournalLimitation] $NewObj = [ZertoVPGSettingJournalLimitation]::New($VPGSettingJournalLimitation)
-    }
 
-    Return $NewObj        
-}
 
 Class ZertoVPGSettingJournal{
     [string] $DatastoreClusterIdentifier; 
@@ -1027,23 +761,7 @@ Class ZertoVPGSettingJournal{
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingJournal {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Setting Journal Limitation object')] [ZertoVPGSettingJournalLimitation] $Limitation, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Journal ')] [PSCustomObject] $VPGSettingJournal
-    )
-    
-    if (-not $VPGSettingJournal) {
-        [ZertoVPGSettingJournal] $NewObj = [ZertoVPGSettingJournal]::New($DatastoreClusterIdentifier, $DatastoreIdentifier, $Limitation);
-    } else {
-        [ZertoVPGSettingJournal] $NewObj = [ZertoVPGSettingJournal]::New($VPGSettingJournal)
-    }
 
-    Return $NewObj
-}
 
 class ZertoVPGSettingNetworksNetworkHypervisor  {
     [String] $DefaultNetworkIdentifier;
@@ -1057,21 +775,7 @@ class ZertoVPGSettingNetworksNetworkHypervisor  {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingNetworksNetworkHypervisor {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DefaultNetworkIdentifier')]   [string] $DefaultNetworkIdentifier = $null,
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Networking Network Hypervisor object')] [PSCustomObject] $VPGSettingNetworkingNetworkHypervisor
-    )
-    
-    if (-not $VPGSettingNetworkingNetworkHypervisor) {
-        [ZertoVPGSettingNetworksNetworkHypervisor] $NewObj = [ZertoVPGSettingNetworksNetworkHypervisor]::New($DefaultNetworkIdentifier);
-    } else {
-        [ZertoVPGSettingNetworksNetworkHypervisor] $NewObj = [ZertoVPGSettingNetworksNetworkHypervisor]::New($VPGSettingNetworkingNetworkHypervisor)
-    }
 
-    Return $NewObj
-}
 
 class ZertoVPGSettingNetworksNetwork {
     [ZertoVPGSettingNetworksNetworkHypervisor] $Hypervisor;
@@ -1085,21 +789,6 @@ class ZertoVPGSettingNetworksNetwork {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingNetworksNetwork {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Hypervisor')] [ZertoVPGSettingNetworksNetworkHypervisor] $Hypervisor,
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'ZertoVPGSettingNetworksNetworkHypervisor object')] [PSCustomObject] $VPGSettingNetworksNetwork
-    )
-    
-    if (-not $VPGSettingNetworksNetwork) {
-        [ZertoVPGSettingNetworksNetwork] $NewObj = [ZertoVPGSettingNetworksNetwork]::New($Hypervisor);
-    } else {
-        [ZertoVPGSettingNetworksNetwork] $NewObj = [ZertoVPGSettingNetworksNetwork]::New($VPGSettingNetworksNetwork)
-    }
-
-    Return $NewObj
-}
 
 class ZertoVPGSettingNetworks {
     [ZertoVPGSettingNetworksNetwork] $Failover;
@@ -1116,27 +805,7 @@ class ZertoVPGSettingNetworks {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingNetworks {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Network Failover object')] [ZertoVPGSettingNetworksNetwork] $Failover, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Network FailoverTest object')] [ZertoVPGSettingNetworksNetwork] $FailoverTest, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Network')] [PSCustomObject] $VPGSettingNetworks
-    )
-    
-    if (-not $VPGSettingNetworks) {
-        #Reset Null Networks
-        if ($Failover -eq $null) { $Failover = New-ZertoVPGSettingNetworkHypervisor -DefaultNetworkIdentifier $null }
-        if ($FailoverTest -eq $null) { $FailoverTest = New-ZertoVPGSettingNetworkHypervisor -DefaultNetworkIdentifier $null }
-        [ZertoVPGSettingNetworks] $NewObj = [ZertoVPGSettingNetworks]::New($Failover, $FailoverTest);
-    } else {
-        if ($VPGSettingNetworks.Failover -eq $null) { $VPGSettingNetworks.Failover = New-ZertoVPGSettingNetworkHypervisor -DefaultNetworkIdentifier $null }
-        if ($VPGSettingNetworks.FailoverTest -eq $null) { $VPGSettingNetworks.FailoverTest = New-ZertoVPGSettingNetworkHypervisor -DefaultNetworkIdentifier $null }
-        [ZertoVPGSettingNetworks] $NewObj = [ZertoVPGSettingNetworks]::New($VPGSettingNetworks)
-    }
 
-    Return $NewObj
-}
 
 Class ZertoVPGSettingRecovery {
     [string] $DefaultDatastoreIdentifier; 
@@ -1206,25 +875,7 @@ class ZertoVPGSettingScript {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingScript {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Command')] [AllowNull()]  [AllowEmptyString()]  [string] $Command, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Parameters')] [AllowNull()]  [AllowEmptyString()] [string] $Parameters, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Timeout In Seconds')] [int] $TimeoutInSeconds = 300, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Script object')] [PSCustomObject] $VPGSettingScript
-    )
-    
-    if (-not $VPGSettingScript) {
-        if ( ($TimeoutInSeconds -lt 300) -or ($TimeoutInSeconds -gt 6000) ) { throw "TimeoutInSeconds must be between 300 & 6000 " }
-        [ZertoVPGSettingScript] $NewObj = [ZertoVPGSettingScript]::New($Command, $Parameters, $TimeoutInSeconds);
-    } else {
-        if ( ($VPGSettingScript.TimeoutInSeconds -lt 300) -or ($VPGSettingScript.TimeoutInSeconds -gt 6000) ) { throw "TimeoutInSeconds must be between 300 & 6000 " }
-        [ZertoVPGSettingScript] $NewObj = [ZertoVPGSettingScript]::New($VPGSettingScript)
-    }
 
-    Return $NewObj
-}
 
 class ZertoVPGSettingScripting {
     [ZertoVPGSettingScript] $PostBackup;
@@ -1244,28 +895,7 @@ class ZertoVPGSettingScripting {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingScripting {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PostBackup script object')] [ZertoVPGSettingScript] $PostBackup, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PostRecovery script object')] [ZertoVPGSettingScript] $PostRecovery, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PreRecovery script object')] [ZertoVPGSettingScript] $PreRecovery, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Scripting')] [PSCustomObject] $VPGSettingScripting
-    )
-    
-    if (-not $VPGSettingScripting) {
-        #Reset Null scripts
-        if ($PostRecovery -eq $null) { $PostRecovery = New-ZertoVPGSettingScript -Command $null -Parameters $null }
-        if ($PreRecovery -eq $null) { $PreRecovery = New-ZertoVPGSettingScript -Command $null -Parameters $null }
-        [ZertoVPGSettingScripting] $NewObj = [ZertoVPGSettingScripting]::New($PostBackupCommand, $PostRecovery, $PreRecovery);
-    } else {
-        if ($VPGSettingScripting.PostRecovery -eq $null) { $VPGSettingScripting.PostRecovery = New-ZertoVPGSettingScript -Command $null -Parameters $null }
-        if ($VPGSettingScripting.PreRecovery -eq $null) { $VPGSettingScripting.PreRecovery = New-ZertoVPGSettingScript -Command $null -Parameters $null }
-        [ZertoVPGSettingScripting] $NewObj = [ZertoVPGSettingScripting]::New($VPGSettingScripting)
-    }
 
-    Return $NewObj
-}
 
 class ZertoVPGSettingVMNicNetworkHypervisorIpConfig {
     [string] $Gateway;
@@ -1299,31 +929,7 @@ class ZertoVPGSettingVMNicNetworkHypervisorIpConfig {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingVMNicNetworkHypervisorIpConfig {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'IsDHCP')] [bool] $IsDhcp = $false,
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'StaticIp')] [string] $StaticIp,
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'SubnetMask')] [string] $SubnetMask,
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Gateway')] [string] $Gateway,
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PrimaryDNS')] [string] $PrimaryDNS,
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'SecondaryDns')] [string] $SecondaryDns,
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM NIC Network object')] [PSCustomObject] $VPGSettingVMNicNetworkHypervisorIpConfig
-    )
 
-    if (-not $VPGSettingVMNicNetworkHypervisorIpConfig) {
-        [ZertoVPGSettingVMNicNetworkHypervisorIpConfig] $NewObj = [ZertoVPGSettingVMNicNetworkHypervisorIpConfig]::New( $Gateway,
-                                                                                                                    $IsDhcp, 
-                                                                                                                    $PrimaryDns,
-                                                                                                                    $SecondaryDns,
-                                                                                                                    $StaticIp,
-                                                                                                                    $SubnetMask );
-    } else {
-        [ZertoVPGSettingVMNicNetworkHypervisorIpConfig] $NewObj = [ZertoVPGSettingVMNicNetworkHypervisorIpConfig]::New($VPGSettingVMNicNetworkHypervisorIpConfig)
-    }
-
-    Return $NewObj
-}  
 
 class ZertoVPGSettingVMNicNetworkHypervisor {
     [string] $DnsSuffix;
@@ -1349,24 +955,7 @@ class ZertoVPGSettingVMNicNetworkHypervisor {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingVMNicNetworkHypervisor {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DNS Suffix')] [string] $DnsSuffix, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPGSetting VM NIC Network Hypervisor IpConfig object')] [ZertoVPGSettingVMNicNetworkHypervisorIpConfig] $IpConfig, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPGSetting VM NIC Network ID')] [string] $NetworkIdentifier,
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Should Replace MacAddress')] [bool] $ShouldReplaceMacAddress, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM NIC Network object')] [PSCustomObject] $VPGSettingVMNicNetworkHypervisor
-    )
-
-    if (-not $VPGSettingVMNicNetworkHypervisor) {
-        [ZertoVPGSettingVMNicNetworkHypervisor] $NewObj = [ZertoVPGSettingVMNicNetworkHypervisor]::New($Hypervisor);
-    } else {
-        [ZertoVPGSettingVMNicNetworkHypervisor] $NewObj = [ZertoVPGSettingVMNicNetworkHypervisor]::New($VPGSettingVMNicNetwork)
-    }
-
-    Return $NewObj
-}  
+  
 
 class ZertoVPGSettingVMNicNetwork {
     [ZertoVPGSettingVMNicNetworkHypervisor] $Hypervisor;
@@ -1380,21 +969,7 @@ class ZertoVPGSettingVMNicNetwork {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingVMNicNetwork {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPGSetting VM NIC Network Hypervisor')] [ZertoVPGSettingVMNicNetworkHypervisor] $Hypervisor, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM NIC Network object')] [PSCustomObject] $VPGSettingVMNicNetwork
-    )
-
-    if (-not $VPGSettingVMNicNetwork) {
-        [ZertoVPGSettingVMNicNetwork] $NewObj = [ZertoVPGSettingVMNicNetwork]::New($Hypervisor);
-    } else {
-        [ZertoVPGSettingVMNicNetwork] $NewObj = [ZertoVPGSettingVMNicNetwork]::New($VPGSettingVMNicNetwork)
-    }
-
-    Return $NewObj
-}    
+   
 
 class ZertoVPGSettingVMNic {
     [ZertoVPGSettingVMNicNetwork] $Failover;
@@ -1415,23 +990,7 @@ class ZertoVPGSettingVMNic {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingVMNic {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Nic Identifier')] [string] $NicIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VM Failover Network')] [ZertoVPGSettingVMNicNetwork] $VMNetworkFailover, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VM Test Network')] [ZertoVPGSettingVMNicNetwork] $VMNetworkTest, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM NIC object')] [PSCustomObject] $VPGSettingVMNic
-    )
 
-    if (-not $VPGSettingVMNic) {
-        [ZertoVPGSettingVMNic] $NewObj = [ZertoVPGSettingVMNic]::New($NicIdentifier, $ParaVMNetworkFailovermeters, $VMNetworkTest);
-    } else {
-        [ZertoVPGSettingVMNic] $NewObj = [ZertoVPGSettingVMNic]::New($VPGSettingVMNic)
-    }
-
-    Return $NewObj
-}
 
 class ZertoVPGSettingVMRecovery {
     [string] $DatastoreClusterIdentifier;
@@ -1465,31 +1024,7 @@ class ZertoVPGSettingVMRecovery {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingVMRecovery {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier = $null, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier = $null, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'FolderIdentifier')] [string] $FolderIdentifier = $null,
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostClusterIdentifier')] [string] $HostClusterIdentifier = $null, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostIdentifier')] [string] $HostIdentifier = $null, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'ResourcePoolIdentifier')] [string] $ResourcePoolIdentifier = $null, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Recovery object')] [PSCustomObject] $VPGSettingVMRecovery
-    )
 
-    if (-not $VPGSettingVMRecovery) {
-        [ZertoVPGSettingVMRecovery] $NewObj = [ZertoVPGSettingVMRecovery]::New($DatastoreClusterIdentifier,
-                                                                        $DatastoreIdentifier,
-                                                                        $FolderIdentifier,
-                                                                        $HostClusterIdentifier,
-                                                                        $HostIdentifier,
-                                                                        $ResourcePoolIdentifier);
-    } else {
-        [ZertoVPGSettingVMRecovery] $NewObj = [ZertoVPGSettingVMRecovery]::New($VPGSettingVMRecovery)
-    }
-
-    Return $NewObj
-}
 
 class ZertoVPGSettingVMVolumeDatastore {
     [string] $DatastoreClusterIdentifier;
@@ -1511,25 +1046,7 @@ class ZertoVPGSettingVMVolumeDatastore {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingVMVolumeDatastore {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'IsSwap')] [bool] $IsThin, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Volume Datastore object')] [PSCustomObject] $VPGSettingVMVolumeDatastore
-    )
 
-    if (-not $VPGSettingVMVolumeDatastore) {
-        [ZertoVPGSettingVMVolumeDatastore] $NewObj = [ZertoVPGSettingVMVolumeDatastore]::New($IsThin,
-                                                                        $DatastoreClusterIdentifier,
-                                                                        $DatastoreIdentifier);
-    } else {
-        [ZertoVPGSettingVMVolumeDatastore] $NewObj = [ZertoVPGSettingVMVolumeDatastore]::New($VPGSettingVMVolumeDatastore)
-    }
-
-    Return $NewObj
-}
 
 class ZertoVPGSettingVMVolumeExistingVolume {
     [string] $DatastoreIdentifier;
@@ -1555,27 +1072,7 @@ class ZertoVPGSettingVMVolumeExistingVolume {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingVMVolumeExistingVolume {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ExistingVmIdentifier')] [string] $ExistingVmIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Mode')] [string] $Mode, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Path')] [string] $Path, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM existing Volume object')] [PSCustomObject] $VPGSettingVMVolumeExistingVolume
-    )
 
-    if (-not $VPGSettingVMVolumeExistingVolume) {
-        [ZertoVPGSettingVMVolumeExistingVolume] $NewObj = [ZertoVPGSettingVMVolumeExistingVolume]::New($DatastoreIdentifier,
-                                                                        $ExistingVmIdentifier,
-                                                                        $Mode,
-                                                                        $Path);
-    } else {
-        [ZertoVPGSettingVMVolumeExistingVolume] $NewObj = [ZertoVPGSettingVMVolumeExistingVolume]::New($VPGSettingVMVolumeExistingVolume)
-    }
-
-    Return $NewObj
-}
 
 class ZertoVPGSettingVMVolume {
     [ZertoVPGSettingVMVolumeDatastore] $Datastore;
@@ -1601,27 +1098,7 @@ class ZertoVPGSettingVMVolume {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingVMVolume {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'IsSwap')] [bool] $IsSwap, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VolumeIdentifier')] [string] $VolumeIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingVMVolumeDatastore')] [string] $Datastore, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingVMVolumeExistingVolume')] [string] $ExistingVolume, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPG Setting VM Volume object')] [PSCustomObject] $VPGSettingVMVolume
-    )
 
-    if (-not $VPGSettingVMVolume) {
-        [ZertoVPGSettingVMVolume] $NewObj = [ZertoVPGSettingVMVolume]::New($IsSwap,
-                                                                        $VolumeIdentifier,
-                                                                        $Datastore,
-                                                                        $ExistingVolume);
-    } else {
-        [ZertoVPGSettingVMVolume] $NewObj = [ZertoVPGSettingVMVolume]::New($VPGSettingVMVolume)
-    }
-
-    Return $NewObj
-}
 
 class ZertoVPGSettingVM {
     [string] $BootGroupIdentifier;
@@ -1654,26 +1131,7 @@ class ZertoVPGSettingVM {
 }
 
 # .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSettingVM {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'BootGroup Identifier')] [string] $BootGroupIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Array of VPG Setting VM Nic objects')] [ZertoVPGSettingVMNic[]] $Nics, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Setting VM Recovery object')] [ZertoVPGSettingVMRecovery] $Recovery, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VM Identifier')] [string] $VmIdentifier, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Array of VPG Setting VM Volume objects')] [ZertoVPGSettingVMVolume[]] $Volumes, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Object')] [PSCustomObject] $VPGSettingVM
-    )
-    
-    if (-not $VPGSettingVM) {
-        #Check for bad values
-        [ZertoVPGSettingVM] $NewObj = [ZertoVPGSettingVM]::New($BootGroupIdentifier, $Journal, $NICs, $Recovery, $VmIdentifier, $Volumes);
-    } else {
-        [ZertoVPGSettingVM] $NewObj = [ZertoVPGSettingVM]::New($VPGSettingVM)
-    }
 
-    Return $NewObj
-}
 
 class ZertoVPGSetting {
     [ZertoVPGSettingBackup] $Backup;
@@ -1716,37 +1174,6 @@ class ZertoVPGSetting {
         $this.VpgSettingsIdentifier = $VpgSettingsIdentifier;
     }  
 }
-
-# .ExternalHelp ZertoModule.psm1-help.xml
-Function New-ZertoVPGSetting {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Backup  object')] [ZertoVPGSettingBackup] $Backup, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Basics  object')] [ZertoVPGSettingBasic] $Basic, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Array of VPG Settings BootGroups  objects')] [ZertoVPGSettingBootGroups[]] $BootGroups, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Journal object')] [ZertoVPGSettingJournal] $Journal,
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Networks object')] [ZertoVPGSettingNetworks] $Networks, 
-        [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Recovery object')] [ZertoVPGSettingRecovery] $Recovery, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Scripting object')] [ZertoVPGSettingNetworks] $Scripting, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Array of VPG Settings Vms objects')] [ZertoVPGSettingVM[]] $Vms, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'VPG Settings VPG Identifier')] [string] $VpgIdentifier, 
-        [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'VPG Settings VPG Settings Identifier')] [string] $VpgSettingsIdentifierVms, 
-        [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Object')] [PSCustomObject] $VPGSetting
-    )
-
-    if (-not $VPGSetting) {
-        #Check for bad values
-        [ZertoVPGSetting] $NewObj = [ZertoVPGSetting]::New($Backup, $Basic, $BootGroups, $Journal, $Networks, $Recovery, $Scripting, `
-                                                            $Vms, $VpgIdentifier, $VpgSettingsIdentifierVms );
-    } else {
-        [ZertoVPGSetting] $NewObj = [ZertoVPGSetting]::New($VPGSetting)
-    }
-
-    Return $NewObj
-}
-
-
-
 #endregion
 
 #region Utility Functions
