@@ -20,7 +20,7 @@ Function Connect-ZertoPeerSite {
             ValueFromPipeline = $true,
             HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken'
         )] 
-        [ValidateNotnullorempty]
+        [ValidateNotnullorempty()]
         [Hashtable] 
         $ZertoToken = ( Get-EnvZertoToken ),
 

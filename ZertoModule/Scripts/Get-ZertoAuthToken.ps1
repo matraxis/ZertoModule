@@ -5,7 +5,7 @@ Function Get-ZertoAuthToken {
             Mandatory = $false, 
             HelpMessage = 'Zerto Server or ENV:\ZertoServer'
         )] 
-        [ValidateNotNullorEmpty]
+        [ValidateNotNullorEmpty()]
         [string] 
         $ZertoServer = ( Get-EnvZertoServer ),
 

@@ -2420,7 +2420,7 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="2">
-				<maml:name>ZertoUser</maml:name>
+				<maml:name>Credential</maml:name>
 				<maml:description>
 					<maml:para />
 				</maml:description>
