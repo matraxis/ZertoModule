@@ -1,6 +1,6 @@
 [CmdletBinding()]
 $Scripts = @( Get-ChildItem -Path $PSScriptRoot\Scripts\*.ps1 -Recurse -ErrorAction SilentlyContinue )
-$Classes = Get-ChildItem -Path $PSScriptRoot\Scripts\Setup-class.ps1
+$Classes = Get-ChildItem -Path $PSScriptRoot\Scripts\Setup-classes.ps1
 . $Classes.fullname
 Write-Verbose -Message "The number of scripts seen is $($Scripts.Count)"
 #$Tests = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -Recurse -ErrorAction SilentlyContinue )
