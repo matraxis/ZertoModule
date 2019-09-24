@@ -1,30 +1,30 @@
-Function Add-ZertoVPG {
+Function Add-VMtoZertoVPG {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
         [Parameter(Mandatory = $false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
         [Parameter(Mandatory = $false, ValueFromPipeline = $true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
         [Parameter(Mandatory = $true, HelpMessage = 'Zerto VPG Name')] [string] $VPGName,
-        [Parameter(Mandatory = $false, HelpMessage = 'Zerto VPG Priority')] [ZertoVPGPriority] $Priority = 'Medium',
-        [Parameter(Mandatory = $true, HelpMessage = 'Zerto Recovery Site Name')] [string] $RecoverySiteName,
-        [Parameter(Mandatory = $false, HelpMessage = 'Zerto RPO Alert in seconds')] [ValidateRange(0, 99999)]  [int] $RPOAlertInSeconds = 300,
-        [Parameter(Mandatory = $false, HelpMessage = 'Zerto Test Interval in minutes')] [ValidateRange(0, 9999999)] [int] $TestIntervalInMinutes = 262080,
-        [Parameter(Mandatory = $false, HelpMessage = 'Host Cluster Name')] [string] $ClusterName,
-        [Parameter(Mandatory = $false, HelpMessage = 'Host Name')] [string] $HostName,
-        [Parameter(Mandatory = $false, HelpMessage = 'Failover Network')] [string] $FailoverNetwork,
-        [Parameter(Mandatory = $false, HelpMessage = 'Failover Network ID')] [string] $FailoverNetworkID,
-        [Parameter(Mandatory = $false, HelpMessage = 'Test Network')] [string] $TestNetwork,
-        [Parameter(Mandatory = $false, HelpMessage = 'Test Network ID')] [string] $TestNetworkID,
-        [Parameter(Mandatory = $false, HelpMessage = 'Datastore Name')] [string] $DatastoreName,
-        [Parameter(Mandatory = $false, HelpMessage = 'Datastore Cluster Name')] [string] $DatastoreClusterName,
-        [Parameter(Mandatory = $false, HelpMessage = 'Use Default for Journal Datastore')] [switch] $JournalUseDefault,
-        [Parameter(Mandatory = $false, HelpMessage = 'Journal Datastore Name')] [string] $JournalDatastoreName,
-        [Parameter(Mandatory = $false, HelpMessage = 'Journal Datastore Cluster Name')] [string] $JournalDatastoreClusterName,
-        [Parameter(Mandatory = $false, HelpMessage = 'Zerto Journal History In Hours')] [ValidateRange(0, 9999)] [int] $JournalHistoryInHours = 24,
-        [Parameter(Mandatory = $false, HelpMessage = 'Zerto Journal Hard Limit in MB')] [ValidateRange(0, 9999999)] [int] $JournalHardLimitMB = 153600,
-        [Parameter(Mandatory = $false, HelpMessage = 'Zerto Journal Warning Threshold in MB')] [ValidateRange(0, 9999999)] [int] $JournalWarningThresholdMB = 115200,
-        [Parameter(Mandatory = $false, HelpMessage = 'Zerto vCenter Folder')] [string] $Folder,
-        [Parameter(Mandatory = $false, HelpMessage = 'Zerto vCenter Folder ID')] [string] $FolderID,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Zerto VPG Priority')] [ZertoVPGPriority] $Priority = 'Medium',
+        #[Parameter(Mandatory = $true, HelpMessage = 'Zerto Recovery Site Name')] [string] $RecoverySiteName,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Zerto RPO Alert in seconds')] [ValidateRange(0, 99999)]  [int] $RPOAlertInSeconds = 300,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Zerto Test Interval in minutes')] [ValidateRange(0, 9999999)] [int] $TestIntervalInMinutes = 262080,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Host Cluster Name')] [string] $ClusterName,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Host Name')] [string] $HostName,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Failover Network')] [string] $FailoverNetwork,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Failover Network ID')] [string] $FailoverNetworkID,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Test Network')] [string] $TestNetwork,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Test Network ID')] [string] $TestNetworkID,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Datastore Name')] [string] $DatastoreName,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Datastore Cluster Name')] [string] $DatastoreClusterName,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Use Default for Journal Datastore')] [switch] $JournalUseDefault,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Journal Datastore Name')] [string] $JournalDatastoreName,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Journal Datastore Cluster Name')] [string] $JournalDatastoreClusterName,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Zerto Journal History In Hours')] [ValidateRange(0, 9999)] [int] $JournalHistoryInHours = 24,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Zerto Journal Hard Limit in MB')] [ValidateRange(0, 9999999)] [int] $JournalHardLimitMB = 153600,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Zerto Journal Warning Threshold in MB')] [ValidateRange(0, 9999999)] [int] $JournalWarningThresholdMB = 115200,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Zerto vCenter Folder')] [string] $Folder,
+        #[Parameter(Mandatory = $false, HelpMessage = 'Zerto vCenter Folder ID')] [string] $FolderID,
         [Parameter(Mandatory = $true, ParameterSetName = "VMNames", HelpMessage = 'Zerto Virtual Machine names')] [string[]] $VmNames,
         [Parameter(Mandatory = $true, ParameterSetName = "VMClass", HelpMessage = 'Zerto VPG Virtual Machine class')] [VPGVirtualMachine[]] $VPGVirtualMachines
         , [Parameter(Mandatory = $false, HelpMessage = 'Commit this Zerto VPG')] [bool] $VPGCommit = $true
@@ -38,6 +38,7 @@ Function Add-ZertoVPG {
     if ([string]::IsNullOrEmpty($VPGName)  ) {
         throw "Missing Zerto VPG Name" 
     }
+ <#
     if ([string]::IsNullOrEmpty($Priority)  ) {
         throw "Missing Zerto Priority" 
     }
@@ -83,14 +84,17 @@ Function Add-ZertoVPG {
     }
     ### Temp validation
     #If ($DatastoreClusterName)  {throw "Cannot specify DatastoreClusterName as a default value for the VPG (bug in zerto 5.0)"}
+  #>
     if ( $VmNames.Count -lt 1 -and $VPGVirtualMachines.Count -lt 1 ) {
         throw "Must specify at least one VmName or VPGVirtualMachine"
     }
     #Get Identifiers
+  
     $LocalSiteID = Get-ZertoLocalSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
     if ([string]::IsNullOrEmpty($LocalSiteID)  ) {
         throw "Could not find Local Site ID" 
     }
+  <#
     $RecoverySiteID = Get-ZertoVirtualizationSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
         -ZertoSiteName $RecoverySiteName
     if ([string]::IsNullOrEmpty($RecoverySiteID)  ) {
@@ -185,6 +189,8 @@ Function Add-ZertoVPG {
             throw "More than one Folder ID has the name $Folder " 
         }
     }
+#>
+
     #Save our VMID in a VMName/ID Hash
     $VMNameAndIDHash = [ordered] @{ }
     if ($VmNames) {
@@ -206,6 +212,8 @@ Function Add-ZertoVPG {
     else {
         throw "No VM's specified"
     }
+
+   <# 
     if ( $RecoverySiteID.Count -gt 1 ) {
         throw "More than one Recovery site has the name $RecoverySiteName " 
     }
@@ -241,8 +249,10 @@ Function Add-ZertoVPG {
             }
         }
     }
+    #>
     #Build up our json object
     $NewBodyHash = [ordered] @{ }
+<#
     $NewBodyHash.Add('Backup' , $null)
     $Basic = [ordered] @{ }
     $Basic.Add( 'JournalHistoryInHours', $JournalHistoryInHours)
@@ -348,6 +358,7 @@ Function Add-ZertoVPG {
     $PreRecovery.Add( 'TimeoutInSeconds', 0)
     $Scripting.Add( 'PreRecovery', $PreRecovery)
     $NewBodyHash.Add( 'Scripting' , $Scripting )
+  #>
     $VMArray = @()
     if ($VmNames) {
         #This section is VM + ID only
@@ -462,29 +473,54 @@ Function Add-ZertoVPG {
     else {
         throw "No VM's specified"
     }
-    $NewBodyHash.Add( 'Vms' , $VMArray)
-    #
-    #Convert VPG Hash to JSON - Remember DEPTH!!!
-    $NewVPGJson = $NewBodyHash | ConvertTo-Json -Depth 20
+
+    #Get VPG ID
+    $VPGID = Get-ZertoVPGID -VpgName $VPGName
+    Write-Verbose $VPGID
+
+    $JSONVPG ="{
+    ""VpgIdentifier"":""$VPGID""
+    }"
+    Write-Verbose $JSONVPG
+    
     $FullURL = $baseURL + "vpgsettings"
     Write-Verbose $FullURL
-    Write-Verbose $NewVPGJson
-    if ($DumpJson ) {
-        #Display JSON, and exit
-        Write-Host $NewVPGJson
-        return
-    }
-    #This POST creates the settings
-    $VPGSettingsID = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $NewVPGJson
+
+    #Create the VPG settings
+    $VPGSettingsID = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $JSONVPG
     if ( $VPGSettingsID -eq $null ) {
-        throw "Error creating VPG" 
+    throw "Error creating VPG" 
     }
     Write-Verbose ("VPGSettingsID: " + $VPGSettingsID)
+
+    Foreach($VM in $VMArray)
+    {
+        $NewBodyHash = $VM
+        #Convert VPG Hash to JSON - Remember DEPTH!!!
+        $NewVMJson = $NewBodyHash | ConvertTo-Json -Depth 20
+   
+        if ($DumpJson ) {
+            #Display JSON, and exit
+            Write-Host $NewVMJson
+            return
+        }
+
+        # Posting the VPG JSON Request to the API
+        $FullURL = $baseURL + "vpgsettings/$VPGSettingsID/vms"
+        Write-Verbose $FullURL
+
+        $PostResponse = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $NewVMJson
+    }
+  <#
+    
     $VPGSetting = Get-ZertoVPGSetting -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgSettingsIdentifier $VPGSettingsID
     if ( $VPGSetting -eq $null ) {
         throw "Error retrieving VPGSettings for VPGSettingsID" 
     }
+    #$VPGSetting | ConvertTo-Json -Depth 20
+ 
     Write-Verbose  $VPGSetting
+  #>
     if (-not $VPGCommit) {
         Write-Host "VPG Setting $VPGSettingsID created.  Commit with '" -NoNewline -ForegroundColor Red
         Write-Host "Submit-ZertoVPGSetting -ZertoVpgSettingsIdentifier $VPGSettingsID" -ForegroundColor Cyan -NoNewline

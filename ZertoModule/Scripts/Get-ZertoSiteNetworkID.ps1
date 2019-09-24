@@ -9,8 +9,7 @@ Function Get-ZertoSiteNetworkID {
     )
     $ID = Get-ZertoSiteNetwork -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
         Where-Object { $_.VirtualizationNetworkName -eq $NetworkName } | `
-        Select-Object
-    NetworkIdentifier -ExpandProperty NetworkIdentifier
+        Select-Object NetworkIdentifier -ExpandProperty NetworkIdentifier
     if ($ID.Count -gt 1) {
         Throw "'$NetworkName' returned more than one ID"
     }
